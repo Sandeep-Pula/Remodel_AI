@@ -1,1 +1,6 @@
 This branch is a source code for performing sentiment analysis on chat bot conversation and figure out the potential leads
+Use this flow...
+
+1. Dataset_generation.py
+2. sentiment_analysis.py
+3. Potential_leads.py
