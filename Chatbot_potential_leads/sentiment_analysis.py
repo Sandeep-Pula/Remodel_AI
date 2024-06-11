@@ -1,20 +1,40 @@
 import pandas as pd
-from textblob import TextBlob
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import nltk
+
+# Download required NLTK resources
+nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('vader_lexicon')
 
 # Load the dataset
 df = pd.read_csv("enhanced_sample_chat_data.csv")
 
-# Function to preprocess text (if necessary)
+# Initialize NLTK tools
+stop_words = set(stopwords.words('english'))
+lemmatizer = WordNetLemmatizer()
+sia = SentimentIntensityAnalyzer()
+
+# Function to preprocess text
 def preprocess_text(text):
-    # Add any preprocessing steps if needed (e.g., removing special characters, stop words)
-    return text
+    # Convert to lowercase
+    text = text.lower()
+    # Tokenize
+    words = word_tokenize(text)
+    # Remove stop words and lemmatize
+    words = [lemmatizer.lemmatize(word) for word in words if word.isalpha() and word not in stop_words]
+    # Reconstruct text
+    return ' '.join(words)
 
-# Function to get sentiment polarity
+# Function to get sentiment polarity using VADER
 def get_sentiment(text):
-    analysis = TextBlob(text)
-    return analysis.sentiment.polarity
+    return sia.polarity_scores(text)['compound']
 
-# Apply sentiment analysis to each lead message
+# Apply preprocessing and sentiment analysis
 df['cleaned_message'] = df['lead_message'].apply(preprocess_text)
 df['sentiment'] = df['cleaned_message'].apply(get_sentiment)
 
